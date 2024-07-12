@@ -26,7 +26,8 @@ namespace Postable.Controllers
         {
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            return Ok(new { message = "User registered successfully" });
+            
+            return Created(string.Empty, user);
         }
 
         [HttpPost("login")]
