@@ -18,5 +18,6 @@ namespace Postable
     }
 
     public DbSet<User> Users => Set<User>();
+    public DbSet<Post> Posts => Set<Post>();
   }
 }
