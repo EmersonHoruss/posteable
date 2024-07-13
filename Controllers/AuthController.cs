@@ -27,7 +27,18 @@ namespace Postable.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             
-            return Created(string.Empty, user);
+            var userShowDto = new UserShowDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Role = user.Role,
+                CreatedAt = user.CreatedAt
+            };
+
+            return Created(string.Empty, userShowDto);
         }
 
         [HttpPost("login")]
