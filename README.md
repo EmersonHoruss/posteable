@@ -1,27 +1,96 @@
-# Evaluación Individual: Postable - RESTful API para Gestión de Posts
+# Postable - RESTful API para Gestión de Posts
 
-### Objetivo
+Bienvenido a Postable, una API RESTful diseñada para gestionar publicaciones (posts) en una red social. Esta API debe ser capaz de manejar diferentes operaciones dependiendo de si el usuario está registrado o no.
 
-Desarrollar una RESTful API para una red social que permita a los usuarios interactuar con publicaciones (Posts). Esta API debe ser capaz de manejar diferentes operaciones dependiendo de si el usuario está registrado o no.
-
-### Requerimientos Técnicos
-
-#### Tecnologías y Herramientas
+## Tecnologías y Herramientas
 
 - **Lenguaje:** C#.
 - **Framework:** .Net Entity Framework Core
 - **Autenticación/Autorización:** JWT.
 - **Base de Datos:** MS SQL Server.
 
-#### Consideraciones adicionales
+## Guía de Configuración y Levantamiento de la Aplicación C# .NET
 
-- Historial adecuado de migraciones de la BD.
-- Validación de datos de entrada.
-- Uso adecuado de códigos de status en las respuestas del servidor.
-- El repositorio deberá incluir:
-  - Código fuente de la API.
-  - Guía de cómo realizar la configuración y levantamiento de la aplicación en archivo `README.md`
-- Bonus: Incluir testing de principales endpoints.
+### Requisitos Previos
+
+Antes de comenzar, asegúrate de tener instalados los siguientes elementos:
+
+- **IDE:** Preferiblemente Visual Studio o Visual Studio Code.
+- **SDK de .NET:** Instalado y configurado en tu sistema.
+- **Base de Datos:** MS SQL Server u otro compatible con Entity Framework Core si la aplicación utiliza una base de datos.
+
+### Pasos para Levantar la Aplicación
+
+1. **Clonar el Repositorio:**
+
+   Clona el repositorio desde el repositorio remoto.
+
+   ```json
+   git clone https://github.com/codeableorg/postable-evaluation-EmersonHoruss
+   cd postable-evaluation-EmersonHoruss
+   ```
+
+2. **Configuración de la Base de Datos:**
+
+   - Crea el archivo appsettings.Development.json y asegúrate de que la cadena de conexión (DefaultConnection) esté configurada correctamente para tu instancia de SQL Server. Además debes configurar el Jwst. Ejemplo:
+
+     ```json
+     {
+       "Jwt": {
+         "Key": "clave-secreta-de-al-menos-32-caracteres",
+         "Issuer": "your_issuer_here",
+         "Audience": "your_audience_here"
+       },
+       "ConnectionStrings": {
+         "DefaultConnection": "Server=HOLA_MUNDO;Database=Postable;Integrated Security=True;TrustServerCertificate=True;"
+       },
+       "Logging": {
+         "LogLevel": {
+           "Default": "Information",
+           "Microsoft.AspNetCore": "Warning"
+         }
+       },
+       "AllowedHosts": "*"
+     }
+     ```
+
+   - Ejecuta las migraciones para crear la estructura inicial de la base de datos:
+     ```json
+     dotnet ef database update
+     ```
+     Esto aplicará todas las migraciones pendientes y creará las tablas necesarias en tu base de datos.
+
+3. **Compilación de Aplicación**
+
+   Compila la aplicación para asegurarte de que no hay errores y para generar el ejecutable.
+
+   ```json
+   dotnet build
+   ```
+
+4. **Ejecutar la Aplicación**
+
+   Una vez configurado y compilado, puedes levantar tu aplicación API Postable:
+
+   ```json
+   dotnet run
+   ```
+
+   Esto iniciará la aplicación en modo de desarrollo y estará disponible en http://localhost:5202 por defecto.
+
+5. **Acceder a Swagger UI**
+
+   Una vez que la aplicación esté ejecutándose, puedes acceder a Swagger UI para explorar y probar los endpoints de tu API. Abre tu navegador web y visita:
+
+   ```json
+     http://localhost:5202/swagger
+   ```
+
+   Esto abrirá la interfaz de Swagger donde puedes ver todos los endpoints disponibles y probar sus operaciones.
+
+6. **Usar Postman**
+
+   Existe una forma alternativa de probar los endpoints, es usando Postman. En la raíz de la aplicación existe un archivo llamado `Postable.postman_collection.json`. Abres postman e importas este archivo, y estás listo para poder probarlo.
 
 ## Esquema de Base de Datos
 
@@ -237,6 +306,8 @@ Desarrollar una RESTful API para una red social que permita a los usuarios inter
   }
   ```
 
+````
+
 - **POST `/login` (Iniciar Sesión)**
   - **Descripción:** Permite a un usuario existente iniciar sesión.
   - **Body:**
@@ -250,3 +321,4 @@ Desarrollar una RESTful API para una red social que permita a los usuarios inter
       "token": "eyJhbGciOiJIUzI1NiIsInR5..."
     }
     ```
+````
