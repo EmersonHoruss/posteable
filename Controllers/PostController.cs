@@ -6,6 +6,7 @@ using Postable.Entities.Dtos;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Postable.Controllers
 {
@@ -73,6 +74,40 @@ namespace Postable.Controllers
             return Ok(response);
         }
 
-        
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> CreatePost([FromBody] PostCreateDto postCreateDto)
+        {
+            var userName = User.FindFirstValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+
+            if (string.IsNullOrEmpty(userName))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == userName);
+
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var post = new Post { UserId = user.Id, Content = postCreateDto.Content };
+
+            _context.Posts.Add(post);
+            await _context.SaveChangesAsync();
+
+            var postShowDto = new PostShowDto
+            {
+                Id = post.Id,
+                Content = post.Content,
+                CreatedAt = post.CreatedAt,
+                UserName = user.Username,
+                LikesCount = post.Likes.Count
+            };
+
+            return CreatedAtAction(nameof(GetPosts), new { id = post.Id }, postShowDto);
+        }
+
     }
 }
