@@ -23,7 +23,7 @@ namespace Postable.Controllers
         }
 
         [HttpGet("me")]
-        public async Task<ActionResult> GetMyProfile()
+        public async Task<ActionResult> GetUser()
         {
             var userName = User.FindFirstValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
             if (string.IsNullOrEmpty(userName))
@@ -50,7 +50,7 @@ namespace Postable.Controllers
         }
 
         [HttpPatch("me")]
-        public async Task<IActionResult> UpdateMyProfile([FromBody] UserUpdateDto userUpdateDto)
+        public async Task<IActionResult> UpdateUser([FromBody] UserUpdateDto userUpdateDto)
         {
             var userName = User.FindFirstValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
             if (string.IsNullOrEmpty(userName))
@@ -96,6 +96,27 @@ namespace Postable.Controllers
                 Role = user.Role,
                 CreatedAt = user.CreatedAt
             });
+        }
+
+        [HttpDelete("me")]
+        public async Task<IActionResult> DeleteUser()
+        {
+            var userName = User.FindFirstValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+            if (string.IsNullOrEmpty(userName))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == userName);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
