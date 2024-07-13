@@ -2,15 +2,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Postable.Entities.Dtos
 {
-    public class UserUpdateDto
+    public class UserCreateDto
     {
         [MinLength(1)]
         [MaxLength(100)]
-        public string? Username { get; set; }
-        
+        [Required]
+        public string Username { get; set; }
+
         [MinLength(1)]
         [MaxLength(100)]
-        public string? Password { get; set; }
+        [Required]
+        public string Password { get; set; }
 
         [MaxLength(100)]
         [EmailAddress]

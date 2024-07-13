@@ -22,11 +22,21 @@ namespace Postable.Controllers
         }
 
         [HttpPost("signup")]
-        public async Task<IActionResult> Signup([FromBody] User user)
+        public async Task<IActionResult> Signup([FromBody] UserCreateDto userCreateDto)
         {
+            var user = new User
+            {
+                Username = userCreateDto.Username,
+                Password = userCreateDto.Password,
+                Email = userCreateDto.Email,
+                FirstName = userCreateDto.FirstName,
+                LastName = userCreateDto.LastName,
+                Role = userCreateDto.Role ?? "user",
+            };
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            
+
             var userShowDto = new UserShowDto
             {
                 Id = user.Id,
