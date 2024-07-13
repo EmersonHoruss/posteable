@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using Postable.Entities;
 using Postable.Entities.Dtos;
+using Microsoft.EntityFrameworkCore;
 
 namespace Postable.Controllers
 {
@@ -24,31 +25,62 @@ namespace Postable.Controllers
         [HttpPost("signup")]
         public async Task<IActionResult> Signup([FromBody] UserCreateDto userCreateDto)
         {
-            var user = new User
+            try
             {
-                Username = userCreateDto.Username,
-                Password = userCreateDto.Password,
-                Email = userCreateDto.Email,
-                FirstName = userCreateDto.FirstName,
-                LastName = userCreateDto.LastName,
-                Role = userCreateDto.Role ?? "user",
-            };
+                var user = new User
+                {
+                    Username = userCreateDto.Username,
+                    Password = userCreateDto.Password,
+                    Email = userCreateDto.Email,
+                    FirstName = userCreateDto.FirstName,
+                    LastName = userCreateDto.LastName,
+                    Role = userCreateDto.Role ?? "user",
+                };
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
 
-            var userShowDto = new UserShowDto
+                var userShowDto = new UserShowDto
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Role = user.Role,
+                    CreatedAt = user.CreatedAt
+                };
+
+                return Created(string.Empty, userShowDto);
+            }
+            catch (DbUpdateException ex)
             {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Role = user.Role,
-                CreatedAt = user.CreatedAt
-            };
+                if ((ex.InnerException as Microsoft.Data.SqlClient.SqlException)?.Number == 2601)
+                {
+                    return Conflict(new
+                    {
+                        error = "Conflict",
+                        message = "Username or Email already exists.",
+                        timestamp = DateTime.UtcNow
+                    });
+                }
 
-            return Created(string.Empty, userShowDto);
+                return StatusCode(500, new
+                {
+                    error = "Internal Server Error",
+                    message = ex.Message,
+                    timestamp = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    error = "Internal Server Error",
+                    message = ex.Message,
+                    timestamp = DateTime.UtcNow
+                });
+            }
         }
 
         [HttpPost("login")]
