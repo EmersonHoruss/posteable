@@ -189,5 +189,43 @@ namespace Postable.Controllers
 
             return Ok(postShowDto);
         }
+
+        [HttpDelete("{postId}/like")]
+        [Authorize]
+        public async Task<IActionResult> UnlikePost(int postId)
+        {
+            var userName = User.FindFirstValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+            if (string.IsNullOrEmpty(userName))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == userName);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var post = await _context.Posts.Include(p => p.Likes).SingleOrDefaultAsync(p => p.Id == postId);
+            var like = post.Likes.SingleOrDefault(l => l.UserId == user.Id);
+            if (post == null || like == null)
+            {
+                return NotFound();
+            }
+
+            post.Likes.Remove(like);
+            await _context.SaveChangesAsync();
+
+            var postShowDto = new PostShowDto
+            {
+                Id = post.Id,
+                Content = post.Content,
+                CreatedAt = post.CreatedAt,
+                UserName = post.User.Username,
+                LikesCount = post.Likes.Count
+            };
+
+            return Ok(postShowDto);
+        }
     }
 }
