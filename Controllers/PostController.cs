@@ -109,5 +109,41 @@ namespace Postable.Controllers
             return CreatedAtAction(nameof(GetPosts), new { id = post.Id }, postShowDto);
         }
 
+        [HttpPatch("{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdatePost(int id, [FromBody] PostUpdateDto postUpdateDto)
+        {
+            var userName = User.FindFirstValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+            if (string.IsNullOrEmpty(userName))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == userName);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var post = await _context.Posts.Include(p => p.User).SingleOrDefaultAsync(p => p.Id == id);
+            if (post == null)
+            {
+                return NotFound();
+            }
+
+            post.Content = postUpdateDto.Content ?? post.Content;
+            await _context.SaveChangesAsync();
+
+            var postShowDto = new PostShowDto
+            {
+                Id = post.Id,
+                Content = post.Content,
+                CreatedAt = post.CreatedAt,
+                UserName = post.User.Username,
+                LikesCount = post.Likes.Count
+            };
+
+            return Ok(postShowDto);
+        }
     }
 }
