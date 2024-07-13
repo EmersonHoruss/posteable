@@ -59,6 +59,7 @@ namespace Postable.Controllers
                 {
                     return Conflict(new
                     {
+                        code = 409,
                         error = "Conflict",
                         message = "Username or Email already exists.",
                         timestamp = DateTime.UtcNow
@@ -67,6 +68,7 @@ namespace Postable.Controllers
 
                 return StatusCode(500, new
                 {
+                    code = 500,
                     error = "Internal Server Error",
                     message = ex.Message,
                     timestamp = DateTime.UtcNow
@@ -76,6 +78,7 @@ namespace Postable.Controllers
             {
                 return StatusCode(500, new
                 {
+                    code = 500,
                     error = "Internal Server Error",
                     message = ex.Message,
                     timestamp = DateTime.UtcNow
@@ -89,7 +92,13 @@ namespace Postable.Controllers
             var user = _context.Users.FirstOrDefault(u => u.Username == userLogin.Username && u.Password == userLogin.Password);
             if (user == null)
             {
-                return Unauthorized();
+                return StatusCode(401, new
+                {
+                    code = 401,
+                    error = "Unauthorized",
+                    message = "Incorrect credentials.",
+                    timestamp = DateTime.UtcNow
+                });
             }
 
             var claims = new[]
