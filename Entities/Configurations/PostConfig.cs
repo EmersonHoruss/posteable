@@ -10,8 +10,10 @@ namespace Postable.Entities.Configurations
         {
             builder.Property(p => p.UserId).IsRequired();
 
-            builder.Property(p => p.Content).IsRequired();
-            
+            builder.Property(p => p.Content)
+                    .HasMaxLength(500)
+                    .IsRequired();
+
             builder.Property(p => p.CreatedAt)
                    .IsRequired()
                    .HasDefaultValueSql("GETDATE()");

@@ -11,12 +11,24 @@ namespace Postable.Entities.Configurations
             builder.HasIndex(u => u.Email).IsUnique();
                 
             builder.Property(u => u.Username)
+                .HasMaxLength(100)
                 .IsRequired();
 
             builder.Property(u => u.Password)
+                .HasMaxLength(100)
                 .IsRequired();
 
+            builder.Property(u => u.Email)
+                .HasMaxLength(100);
+
+            builder.Property(u => u.FirstName)
+                .HasMaxLength(50);
+
+            builder.Property(u => u.LastName)
+                .HasMaxLength(50);
+
             builder.Property(u => u.Role)
+                .HasMaxLength(20)
                 .IsRequired()
                 .HasDefaultValue("user");
 
